@@ -378,5 +378,112 @@
             }
         }
 
+        /**
+         * Send the HTTP response
+        */
+
+        private function sendResponse() {
+            // Set HTTP status code
+            http_response_code($this->statusCode);
+
+            // Output result as JSON
+
+            echo json_encode($this->result, JSON_PRETTY_PRINT);
+        }
+
+        /**
+         * Get and parse input data from request body
+         *
+         * @return array Parsed input data
+        */
+
+        private function getInputData() {
+            $inputData = [];
+
+            // Get request body
+            $inputJSON = file_get_contents('php://input');
+
+            // Try to decode JSON data
+            if(!empty($inputJSON)) {
+                $decoded = json_decode($inputJSON, true);
+                if($decoded !== null) {
+                    $inputData = $decoded;
+                }
+
+            }
+            // if JSON decoding failed, check for POST data
+            if(empty($inputData) && !empty($_POST)) {
+                $inputData = $_POST;
+            }
+
+            // Sanitize all input data
+            foreach($inputData as $key => $value) {
+                $inputData[$key] = $this->sanitizeInput($value);
+            }
+            return $inputData;
+        }
+        /**
+         * Validating person data
+         *
+         * @param array $data Data to validate
+         * @return bool True if valid, false otherwise
+        */
+
+        private function validatePersonData($data) {
+            // Check required fields
+            $requiredFields = ['firstname', 'lastname', 'phone'];
+            foreach($requiredFields as $field) {
+                if(!isset($data[$field]) || trim($data[$field])==='') {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /**
+         * Sanitize user input
+         * @ param mixed $input Input to sanitize
+         * @return mixed Sanatized input
+        */
+
+        private function sanitizeInput($input) {
+            if(is_array($input)) {
+                foreach($input as $key => $value) {
+                    $input[$key] = $this->sanitizeInput($value);
+                }
+                return $input;
+            }
+
+            // For string inputs
+            if(is_string($input)) {
+
+                // Remove any HTML tags
+                $input = strip_tags($input);
+
+                // Convert special characters to HTML entites
+                $input = htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+
+            }
+            return $input;
+
+        }
+
+        /**
+         * GEt the base URL for the API
+         *
+         * @return string Base URL
+        */
+
+        private function getBaseUrl() {
+            $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+            $host = $_SERVER['HTTP_HOST'];
+            $script =  $_SERVER['SCRIPT_NAME'];
+
+            return "$protocol://$host$script";
+        }
     }
+    // Create and run the API
+    $api = new PeopleApi();
+    $api->handleRequest();
 ?>
