@@ -9,7 +9,7 @@
      * @version 2.3
     **/
 
-    // Set apporaitae header ofr the API's repsonses
+    // Set the appropriate header for the API's repsonses
     header('Content-Type: application/json');
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Headers: GET, POST, PUT, DELETE');
@@ -44,9 +44,9 @@
             try {
                 // Initlialize db connection using PDO
                 $host = 'localhost';
-                $dbname = 'phpAPIdatabase';
-                $username = 'rk738';
-                $password = 'Bagmam4p';
+                $dbname = 'rk738_ci527_test';
+                $username = 'rk738_User';
+                $password = 'UnicornEggs2003!';
 
                 $this-> db = new PDO("mysql:host=$host;dbname=$dbname; charset=utf8", $username, $password);
 
