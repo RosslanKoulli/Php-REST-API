@@ -249,5 +249,134 @@
         /**
          * Handle PUT requests (Update)
         */
+
+        private function handlePut($id = null) {
+            // Check if ID is provided
+            if ($id === null) {
+                $this->statusCode = 400;
+                $this->result = [
+                    'error' => true,
+                    'message' => 'ID is required for PUT requests'
+                ];
+                return;
+            }
+            // Get input data
+            $inputData = $this->getInputData();
+
+            // Validate required fields
+            if(!$this->validatePersonData($inputData)) {
+                $this->statusCode = 400;
+                $this->result = [
+                    'error' => true,
+                    'message' => 'Missing required fields(firstname, lastname, phone)'
+                ];
+                return;
+            }
+
+            try {
+                // Check if person exists
+                $checkStmt = $this->db->prepare('SELECT id FROM people WHERE id = :id');
+                $checkStmt -> bindParam(':id', $id, PDO::PARAM_INT);
+                $checkStmt -> execute();
+
+                if(!$checkStmt->fetch()){
+                    $this->statusCode = 404;
+                    $this->result = [
+                        'error' => true,
+                        'message' => 'Person not found'
+                    ];
+                    return;
+                }
+                // Update person
+                $stmt = $this->db->prepare('
+                UPDATE people
+                SET firstname = :firstname, lastname = :lastname, phone = :phone
+                WHERE id = :id
+                ');
+
+                $stmt -> bindParam(':id, $id, PDO::PARAM_INT');
+                $stmt ->bindParam(':firstname', $inputData['firstname'], PDO::PARAM_STR);
+                $stmt ->bindParam(':lastname', $inputData['lastname'], PDO::PARAM_STR);
+                $stmt ->bindParam(':phone', $inputData['phone'], PDO::PARAM_STR);
+
+                if($stmt->execute()) {
+                    $this-> statusCode = 200;
+                    $this->result = [
+                        'id' => $id,
+                        'message' =>  'Succesfully updated person entry'
+                    ];
+                } else {
+                    $this->statusCode = 500;
+                    $this->result = [
+                        'error' => true,
+                        'message' => 'Failed to update person entry'
+                    ];
+                }
+            } catch(PDOException $e) {
+                $this -> statusCode = 500;
+                $this -> result = [
+                    'error' => true,
+                    'message' => 'Database Error',
+                    'details' => $e->getMessage()
+                ];
+            }
+        }
+
+        /**
+         * Handle DELETE requests
+         *
+         * @param int|null $id ID of the person to delete
+        */
+
+        private function handleDelete($id = null) {
+            // Check if ID is provided
+            if($id === null) {
+                $this -> statusCode = 400;
+                $this->result = [
+                    'error' => true,
+                    'message' => 'ID is required for DELETE requests'
+                ];
+                return;
+            }
+            try {
+                // Check if person exists
+                $checkStmt = $this->db->prepare('SELECT id FROM people WHERE id = :id');
+                $checkStmt -> bindParam(':id', $id, PDO::PARAM_INT);
+                $checkStmt -> execute();
+
+                if(!$checkStmt->fetch()){
+                    $this->statusCode = 404;
+                    $this->result = [
+                        'error' => true,
+                        'message' => 'Person not found'
+                    ];
+                    return;
+                }
+                // Delete person
+                $stmt = $this->db->prepare('DELETE FROM people WHERE id = :id');
+                $stmt -> bindParam(':id', $id, PDO::PARAM_INT);
+
+                if($stmt->execute()) {
+                    $this-> statusCode = 200;
+                    $this->result = [
+                        'message'  =>  'Succesfully deleted person entry'
+                    ];
+                } else {
+                    $this->statusCode = 500;
+                    $this->result = [
+                        'error' => true,
+                        'message' => 'Failed to delete person entry'
+                    ];
+                }
+            } catch(PDOException $e) {
+                $this -> statusCode = 500;
+                $this -> result = [
+                    'error' => true,
+                    'message' => 'Database Error',
+                    'details' => $e->getMessage()
+                ];
+            }
+        }
+
     }
 ?>
