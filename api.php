@@ -9,6 +9,11 @@
      * @version 2.3
     **/
 
+    // Enable error reporting
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+
     // Set the appropriate header for the API's repsonses
     header('Content-Type: application/json');
     header('Access-Control-Allow-Origin: *');
@@ -57,11 +62,11 @@
                 $this->db ->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
             } catch (PDOException $e) {
-                // Log dtabase connection error
+                // Log database connection error
                 $this -> statusCode = 500;
                 $this -> result = [
                     'error' => true,
-                    'message' => 'Database connection Error',
+                    'message' => 'Failed to connect to Database in construct function Error ',
                     'details' => $e->getMessage()
 
                 ];
@@ -122,7 +127,7 @@
                         $this-> handleDelete($id);
                         break;
                     default:
-                        // Method not allowed
+                        // Method is not allowed
                         $this -> statusCode =  405;
                         $this -> result = [
                             'error' => true,
@@ -201,7 +206,7 @@
             $inputData = $this->getInputData();
 
             // Validating required fields
-            if(!$this -> valudatePersonData($inputData)){
+            if(!$this -> validatePersonData($inputData)){
                 $this -> statusCode = 400;
                 $this -> result = [
                     'error' => true,
@@ -294,7 +299,7 @@
                 WHERE id = :id
                 ');
 
-                $stmt -> bindParam(':id, $id, PDO::PARAM_INT');
+                $stmt -> bindParam(':id', $id, PDO::PARAM_INT);
                 $stmt ->bindParam(':firstname', $inputData['firstname'], PDO::PARAM_STR);
                 $stmt ->bindParam(':lastname', $inputData['lastname'], PDO::PARAM_STR);
                 $stmt ->bindParam(':phone', $inputData['phone'], PDO::PARAM_STR);
@@ -461,7 +466,7 @@
                 // Remove any HTML tags
                 $input = strip_tags($input);
 
-                // Convert special characters to HTML entites
+                // Convert special characters to HTML entities
                 $input = htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
 
             }
