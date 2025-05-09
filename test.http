@@ -1,0 +1,687 @@
+# ===== CI527 Comprehensive REST API Test Suite =====
+# This test file contains 80+ tests to thoroughly test all aspects of the API
+
+@baseUrl = https://rk738.brighton.domains/ci527/assignment2/api.php
+# Change this URL to your actual API endpoint
+
+# ============================================================
+# GET REQUESTS - Retrieving Data
+# ============================================================
+
+### 1. Get all people (Should return 200 OK with array of people)
+GET {{baseUrl}}
+Accept: application/json
+
+### 2. Get a specific person by ID (Should return 200 OK with person details)
+GET {{baseUrl}}?id=1
+Accept: application/json
+
+### 3. Get a non-existent person (Should return 404 Not Found)
+GET {{baseUrl}}?id=999
+Accept: application/json
+
+### 4. Get a person with invalid ID format - letters (Should return 400 Bad Request)
+GET {{baseUrl}}?id=abc
+Accept: application/json
+
+### 5. Get a person with invalid ID format - special characters (Should return 400 Bad Request)
+GET {{baseUrl}}?id=!@#$
+Accept: application/json
+
+### 6. Get a person with negative ID (Should handle appropriately)
+GET {{baseUrl}}?id=-1
+Accept: application/json
+
+### 7. Get a person with zero ID (Should handle appropriately)
+GET {{baseUrl}}?id=0
+Accept: application/json
+
+### 8. Get a person with very large ID (Should handle appropriately)
+GET {{baseUrl}}?id=99999999999999
+Accept: application/json
+
+### 9. Get a person with decimal ID (Should handle appropriately)
+GET {{baseUrl}}?id=1.5
+Accept: application/json
+
+### 10. Get request with additional unused parameters (Should ignore them)
+GET {{baseUrl}}?id=1&unused=parameter
+Accept: application/json
+
+# ============================================================
+# POST REQUESTS - Creating Data
+# ============================================================
+
+### 11. Create a new person with valid data (Should return 201 Created)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Mark",
+  "lastname": "Taylor",
+  "phone": "555-111-2222"
+}
+
+### 12. Create a new person with minimal valid data (Should return 201 Created)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "John",
+  "lastname": "Smith",
+  "phone": "123456"
+}
+
+### 13. Create a new person with missing firstname (Should return 400 Bad Request)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "lastname": "Taylor",
+  "phone": "555-111-2222"
+}
+
+### 14. Create a new person with missing lastname (Should return 400 Bad Request)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Mark",
+  "phone": "555-111-2222"
+}
+
+### 15. Create a new person with missing phone (Should return 400 Bad Request)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Mark",
+  "lastname": "Taylor"
+}
+
+### 16. Create a new person with empty firstname (Should return 400 Bad Request)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "",
+  "lastname": "Taylor",
+  "phone": "555-111-2222"
+}
+
+### 17. Create a new person with empty lastname (Should return 400 Bad Request)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Mark",
+  "lastname": "",
+  "phone": "555-111-2222"
+}
+
+### 18. Create a new person with empty phone (Should return 400 Bad Request)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Mark",
+  "lastname": "Taylor",
+  "phone": ""
+}
+
+### 19. Create a new person with extra fields (Should ignore extra fields)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Extra",
+  "lastname": "Fields",
+  "phone": "555-111-2222",
+  "email": "extra@example.com",
+  "address": "123 Test St"
+}
+
+### 20. Create a new person with malformed JSON (Should return 400 Bad Request)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Bad,
+  "lastname": "JSON",
+  "phone": "555-000-0000"
+}
+
+### 21. Create a new person with long values (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "ThisIsAReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongFirstName",
+  "lastname": "ThisIsAReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongLastName",
+  "phone": "12345678901234567890123456789012345"
+}
+
+### 22. Create a new person with numbers in name fields (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "User123",
+  "lastname": "456Test",
+  "phone": "555-111-2222"
+}
+
+### 23. Create a new person with special characters (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Special@#",
+  "lastname": "%^&*Chars",
+  "phone": "555-111-2222"
+}
+
+### 24. Create a new person with HTML in fields (Should sanitize)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "<script>alert('XSS')</script>John",
+  "lastname": "<b>Smith</b>",
+  "phone": "555-111-2222"
+}
+
+### 25. Create with form data instead of JSON (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+firstname=FormData&lastname=Test&phone=555-222-3333
+
+# ============================================================
+# PUT REQUESTS - Updating Data
+# ============================================================
+
+### 26. Update an existing person with valid data (Should return 200 OK)
+PUT {{baseUrl}}?id=1
+Content-Type: application/json
+
+{
+  "firstname": "Updated",
+  "lastname": "Person",
+  "phone": "555-999-8888"
+}
+
+### 27. Update a non-existent person (Should return 404 Not Found)
+PUT {{baseUrl}}?id=999
+Content-Type: application/json
+
+{
+  "firstname": "Nobody",
+  "lastname": "NoSuch",
+  "phone": "555-000-0000"
+}
+
+### 28. Update with missing ID (Should return 400 Bad Request)
+PUT {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Missing",
+  "lastname": "ID",
+  "phone": "555-123-4567"
+}
+
+### 29. Update with invalid ID format (Should return 400 Bad Request)
+PUT {{baseUrl}}?id=abc
+Content-Type: application/json
+
+{
+  "firstname": "Invalid",
+  "lastname": "ID",
+  "phone": "555-123-4567"
+}
+
+### 30. Update with missing firstname (Should return 400 Bad Request)
+PUT {{baseUrl}}?id=1
+Content-Type: application/json
+
+{
+  "lastname": "Person",
+  "phone": "555-999-8888"
+}
+
+### 31. Update with missing lastname (Should return 400 Bad Request)
+PUT {{baseUrl}}?id=1
+Content-Type: application/json
+
+{
+  "firstname": "Updated",
+  "phone": "555-999-8888"
+}
+
+### 32. Update with missing phone (Should return 400 Bad Request)
+PUT {{baseUrl}}?id=1
+Content-Type: application/json
+
+{
+  "firstname": "Updated",
+  "lastname": "Person"
+}
+
+### 33. Update with empty firstname (Should return 400 Bad Request)
+PUT {{baseUrl}}?id=1
+Content-Type: application/json
+
+{
+  "firstname": "",
+  "lastname": "Person",
+  "phone": "555-999-8888"
+}
+
+### 34. Update with empty lastname (Should return 400 Bad Request)
+PUT {{baseUrl}}?id=1
+Content-Type: application/json
+
+{
+  "firstname": "Updated",
+  "lastname": "",
+  "phone": "555-999-8888"
+}
+
+### 35. Update with empty phone (Should return 400 Bad Request)
+PUT {{baseUrl}}?id=1
+Content-Type: application/json
+
+{
+  "firstname": "Updated",
+  "lastname": "Person",
+  "phone": ""
+}
+
+### 36. Update with extra fields (Should ignore extra fields)
+PUT {{baseUrl}}?id=1
+Content-Type: application/json
+
+{
+  "firstname": "Extra",
+  "lastname": "Fields",
+  "phone": "555-111-2222",
+  "email": "extra@example.com",
+  "address": "123 Test St"
+}
+
+### 37. Update with malformed JSON (Should return 400 Bad Request)
+PUT {{baseUrl}}?id=1
+Content-Type: application/json
+
+{
+  "firstname": "Bad,
+  "lastname": "JSON",
+  "phone": "555-000-0000"
+}
+
+### 38. Update with invalid ID format - special characters (Should return 400 Bad Request)
+PUT {{baseUrl}}?id=!@#$
+Content-Type: application/json
+
+{
+  "firstname": "Special",
+  "lastname": "Chars",
+  "phone": "555-123-4567"
+}
+
+### 39. Update with negative ID (Should handle appropriately)
+PUT {{baseUrl}}?id=-1
+Content-Type: application/json
+
+{
+  "firstname": "Negative",
+  "lastname": "ID",
+  "phone": "555-123-4567"
+}
+
+### 40. Update with zero ID (Should handle appropriately)
+PUT {{baseUrl}}?id=0
+Content-Type: application/json
+
+{
+  "firstname": "Zero",
+  "lastname": "ID",
+  "phone": "555-123-4567"
+}
+
+### 41. Update with very large ID (Should handle appropriately)
+PUT {{baseUrl}}?id=99999999999999
+Content-Type: application/json
+
+{
+  "firstname": "Large",
+  "lastname": "ID",
+  "phone": "555-123-4567"
+}
+
+### 42. Update with HTML content (Should sanitize)
+PUT {{baseUrl}}?id=1
+Content-Type: application/json
+
+{
+  "firstname": "<script>alert('XSS')</script>John",
+  "lastname": "<b>Smith</b>",
+  "phone": "555-111-2222"
+}
+
+### 43. Update with form data instead of JSON (Should handle appropriately)
+PUT {{baseUrl}}?id=1
+Content-Type: application/x-www-form-urlencoded
+
+firstname=FormData&lastname=Update&phone=555-222-3333
+
+# ============================================================
+# DELETE REQUESTS - Removing Data
+# ============================================================
+
+### 44. Delete an existing person (Should return 200 OK)
+# Note: You may need to change the ID if you've already deleted this record
+DELETE {{baseUrl}}?id=2
+Accept: application/json
+
+### 45. Delete a non-existent person (Should return 404 Not Found)
+DELETE {{baseUrl}}?id=999
+Accept: application/json
+
+### 46. Delete without ID (Should return 400 Bad Request)
+DELETE {{baseUrl}}
+Accept: application/json
+
+### 47. Delete with invalid ID format - letters (Should return 400 Bad Request)
+DELETE {{baseUrl}}?id=abc
+Accept: application/json
+
+### 48. Delete with invalid ID format - special characters (Should return 400 Bad Request)
+DELETE {{baseUrl}}?id=!@#$
+Accept: application/json
+
+### 49. Delete with negative ID (Should handle appropriately)
+DELETE {{baseUrl}}?id=-1
+Accept: application/json
+
+### 50. Delete with zero ID (Should handle appropriately)
+DELETE {{baseUrl}}?id=0
+Accept: application/json
+
+### 51. Delete with very large ID (Should handle appropriately)
+DELETE {{baseUrl}}?id=99999999999999
+Accept: application/json
+
+### 52. Delete with decimal ID (Should handle appropriately)
+DELETE {{baseUrl}}?id=1.5
+Accept: application/json
+
+### 53. Delete with additional unused parameters (Should ignore them)
+DELETE {{baseUrl}}?id=3&unused=parameter
+Accept: application/json
+
+# ============================================================
+# HEADER AND CONTENT TYPE TESTS
+# ============================================================
+
+### 54. GET with Accept header for XML (Should still return JSON or appropriate response)
+GET {{baseUrl}}
+Accept: application/xml
+
+### 55. POST with incorrect Content-Type (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: text/plain
+
+firstname=Plain&lastname=Text&phone=555-222-3333
+
+### 56. PUT with incorrect Content-Type (Should handle appropriately)
+PUT {{baseUrl}}?id=1
+Content-Type: text/plain
+
+firstname=Plain&lastname=Text&phone=555-222-3333
+
+### 57. GET without Accept header (Should use default content type)
+GET {{baseUrl}}
+
+### 58. POST without Content-Type header (Should handle appropriately)
+POST {{baseUrl}}
+
+{
+    "firstname": "No",
+    "lastname": "ContentType",
+    "phone": "555-111-2222"
+}
+
+# ============================================================
+# HTTP METHOD TESTS
+# ============================================================
+
+### 59. Using an unsupported HTTP method - PATCH (Should return 405 Method Not Allowed)
+PATCH {{baseUrl}}?id=1
+Content-Type: application/json
+
+{
+  "phone": "555-222-3333"
+}
+
+### 60. Using an unsupported HTTP method - HEAD (Should handle appropriately)
+HEAD {{baseUrl}}
+Accept: application/json
+
+### 61. Using an OPTIONS request (Should return 200 OK with appropriate headers)
+OPTIONS {{baseUrl}}
+Accept: application/json
+
+# ============================================================
+# ERROR HANDLING TESTS
+# ============================================================
+
+### 62. Test with malformed URL (Should be handled by server)
+GET {{baseUrl}}/%
+Accept: application/json
+
+### 63. Test with extremely long parameter (Should handle appropriately)
+GET {{baseUrl}}?id=12345678901234567890123456789012345678901234567890123456789012345678901234567890
+Accept: application/json
+
+### 64. Test with extremely long JSON payload (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sagittis eros eget magna iaculis, vel commodo orci pulvinar. Aenean ac rhoncus nibh. Phasellus porta felis eget tincidunt luctus. Curabitur sed egestas felis. Quisque a pharetra libero, nec faucibus velit. Nam condimentum lacus in magna convallis, in facilisis justo lobortis.",
+  "lastname": "In aliquam turpis arcu, id pulvinar nibh consectetur id. Praesent gravida, ipsum eu bibendum imperdiet, purus sapien volutpat ligula, nec faucibus justo purus id nulla. Sed volutpat mi quis nulla tincidunt, et cursus nisl viverra. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aenean blandit venenatis velit, non maximus sem accumsan in.",
+  "phone": "5555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555"
+}
+
+### 65. Test with array instead of object (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+[
+  "Mark",
+  "Taylor",
+  "555-111-2222"
+]
+
+### 66. Test with empty JSON object (Should return 400 Bad Request)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{}
+
+### 67. Test with null values (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": null,
+  "lastname": null,
+  "phone": null
+}
+
+### 68. Test with boolean values (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": true,
+  "lastname": false,
+  "phone": "555-111-2222"
+}
+
+### 69. Test with numeric values for strings (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": 12345,
+  "lastname": 67890,
+  "phone": "555-111-2222"
+}
+
+# ============================================================
+# SECURITY TESTS
+# ============================================================
+
+### 70. Test SQL injection attempt in ID parameter (Should be protected)
+GET {{baseUrl}}?id=1%20OR%201=1
+Accept: application/json
+
+### 71. Test SQL injection attempt in POST data (Should be protected)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Robert'); DROP TABLE people; --",
+  "lastname": "Tables",
+  "phone": "555-111-2222"
+}
+
+### 72. Test XSS attempt (Should be protected)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "<script>alert(document.cookie)</script>",
+  "lastname": "<img src='x' onerror='alert(1)'>",
+  "phone": "555-111-2222"
+}
+
+### 73. Test with overly large payload (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+    "firstname": "{{ 'X'.repeat(5000) }}",
+    "lastname": "{{ 'Y'.repeat(5000) }}",
+    "phone": "{{ 'Z'.repeat(5000) }}"
+}
+
+# ============================================================
+# EDGE CASE TESTS
+# ============================================================
+
+### 74. Test with unicode characters (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "José",
+  "lastname": "Mañana",
+  "phone": "555-111-2222"
+}
+
+### 75. Test with emoji characters (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "John 😀",
+  "lastname": "Smith 👍",
+  "phone": "555-111-2222"
+}
+
+### 76. Test with multi-byte characters (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "田中",
+  "lastname": "李",
+  "phone": "555-111-2222"
+}
+
+### 77. Test with whitespace-only values (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "   ",
+  "lastname": "   ",
+  "phone": "   "
+}
+
+### 78. Test with newlines in values (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "First\nName",
+  "lastname": "Last\nName",
+  "phone": "555-111-\n2222"
+}
+
+### 79. Test with tab characters in values (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "First\tName",
+  "lastname": "Last\tName",
+  "phone": "555-111-\t2222"
+}
+
+### 80. Test with control characters in values (Should handle appropriately)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "First\u0000Name",
+  "lastname": "Last\u0001Name",
+  "phone": "555-111-\u00022222"
+}
+
+# ============================================================
+# FUNCTIONAL SEQUENCE TESTS
+# ============================================================
+
+### 81. Create a person, then retrieve it, then update it, then delete it
+# Step 1: Create
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "firstname": "Sequence",
+  "lastname": "Test",
+  "phone": "555-123-4567"
+}
+
+### 82. Step 2: Retrieve (update the ID based on the response from step 81)
+GET {{baseUrl}}?id=10
+Accept: application/json
+
+### 83. Step 3: Update (update the ID based on the response from step 81)
+PUT {{baseUrl}}?id=10
+Content-Type: application/json
+
+{
+  "firstname": "Updated",
+  "lastname": "Sequence",
+  "phone": "555-765-4321"
+}
+
+### 84. Step 4: Delete (update the ID based on the response from step 81)
+DELETE {{baseUrl}}?id=10
+Accept: application/json
