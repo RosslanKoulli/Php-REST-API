@@ -5,7 +5,7 @@
      * This server provides a REST API for creating and retrieving messages
      * between users in a messaging system.
      *
-     * @ Author Rosslan Koulli
+     * @Author Rosslan Koulli
      * @version 3.0
     **/
 
@@ -13,20 +13,20 @@
     /**
      * Database Access Layer
      *
-     * Handles database connection using MySQLi with proper error handling.
-     * Implements singleton-like pattern through constructor/destructor.
+     * Handles database connection using MySQL with proper error handling.
+     * Implement a singleton-like pattern through constructor/destructor.
      */
     class DBAccess
     {
         private $host = "localhost";
-        private $user = "rk738_User";
+        private $user = "rk738_retake_user";
         private $pass = "UnicornEggs2003!";
-        private $db = "rk738_ci527_test";
+        private $db = "rk738_retake_database";
         private $conn;
 
         /**
          * Establish database connection
-         * Sets proper error reporting and character set
+         * Setting proper error reporting and character set
          */
         public function __construct()
         {
@@ -233,7 +233,7 @@
         }
 
         /**
-         * Handle POST requests - Create new message
+         * Handle POST requests - Create new messages
          *
          * Expected POST data:
          * - source: Username of sender (4-16 alphanumeric chars)

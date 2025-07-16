@@ -1,0 +1,38 @@
+### REST API TEST queries
+### For version 3.0 of the api.php
+
+@baseUrl = https://rk738.brighton.domains/ci527/assignment2/api.php
+
+
+#POST Tests(Creating messages)
+
+### TEST 1
+### Creating a valid message
+
+POST{{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=alice123&target=bob456&message= Hello Bobbin, how are you doing?
+
+### TEST 2
+### Creating another valid message
+POST{{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=bob456&target=alice123&message=Hi Alice! I'm doing good, appreciate that you asked.
+
+### TEST 3
+### Creating a message with special character
+POST{{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=charlie7&target-diana999&message=Check out this link: https://example.com?param=value&other=123
+
+### TEST 4
+### Creating an empty message (should work)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=test1234&target=user5678&message=
+
+
