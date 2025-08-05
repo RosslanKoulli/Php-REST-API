@@ -574,10 +574,10 @@ GET {{baseUrl}}?source=rapid1&target=rapid2
 ### - 500: Internal server error
 ###
 ### This comprehensive test suite covers:
-### ✓ All required functionality
-### ✓ Edge cases and boundary conditions
-### ✓ Error handling scenarios
-### ✓ Security vulnerability testing
-### ✓ Integration workflows
-### ✓ Performance stress testing
+### - All required functionality
+### - Edge cases and boundary conditions
+### - Error handling scenarios
+### - Security vulnerability testing
+### - Integration workflows
+### - Performance stress testing
 ###
