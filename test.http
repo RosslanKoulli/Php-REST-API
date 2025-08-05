@@ -561,7 +561,7 @@ GET {{baseUrl}}?source=rapid1&target=rapid2
 ###
 ### Security Tests (69-74):
 ### - SQL injection attempts (4 tests)
-### - XSS and HTML injection (2 tests)
+### - XSS and HTML injection (2 temultiplests)
 ###
 ### Workflow Tests (75-82):
 ### - Integration scenarios (8 tests)
@@ -574,11 +574,4 @@ GET {{baseUrl}}?source=rapid1&target=rapid2
 ### - 405: Method not allowed
 ### - 500: Internal server error
 ###
-### This comprehensive test suite covers:
-### - All required functionality
-### - Edge cases and boundary conditions
-### - Error handling scenarios
-### - Security vulnerability testing
-### - Integration workflows
-### - Performance stress testing
 ###

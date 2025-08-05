@@ -1,7 +1,8 @@
 <?php
 /**
  * REST API for messaging system
- * Clean production version without debug output
+ * Clean production version with debug output commented out
+ * Version 3.9
  */
 
 // Comment out error reporting for production
