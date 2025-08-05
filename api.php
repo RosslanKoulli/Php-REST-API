@@ -176,15 +176,15 @@
                 // Build query based on provided parameters
                 if (!empty($source) && !empty($target)) {
                     // Get messages between specific users
-                    $stmt = $this->conn->prepare("SELECT id, target, source, text, sent FROM message WHERE source = ? AND target = ? ORDER BY sent ASC");
+                    $stmt = $this->conn->prepare("SELECT id, target, source, message, sent FROM message WHERE source = ? AND target = ? ORDER BY sent ASC");
                     $stmt->bind_param("ss", $source, $target);
                 } else if (!empty($source)) {
                     // Get all messages sent by source
-                    $stmt = $this->conn->prepare("SELECT id, target, source, text, sent FROM message WHERE source = ? ORDER BY sent ASC");
+                    $stmt = $this->conn->prepare("SELECT id, target, source, message, sent FROM message WHERE source = ? ORDER BY sent ASC");
                     $stmt->bind_param("s", $source);
                 } else {
                     // Get all messages sent to target
-                    $stmt = $this->conn->prepare("SELECT id, target, source, text, sent FROM message WHERE target = ? ORDER BY sent ASC");
+                    $stmt = $this->conn->prepare("SELECT id, target, source, message, sent FROM message WHERE target = ? ORDER BY sent ASC");
                     $stmt->bind_param("s", $target);
                 }
 
@@ -208,7 +208,7 @@
                         'sent' => $row['sent'],
                         'source' => $row['source'],
                         'target' => $row['target'],
-                        'message' => $row['text']
+                        'message' => $row['message']
                     ];
                 }
 
@@ -280,7 +280,7 @@
                 }
 
                 // Insert message into database
-                $stmt = $this->conn->prepare("INSERT INTO message (target, source, text) VALUES (?, ?, ?)");
+                $stmt = $this->conn->prepare("INSERT INTO message (target, source, message) VALUES (?, ?, ?)");
                 $stmt->bind_param("sss", $target, $source, $message);
                 $stmt->execute();
 

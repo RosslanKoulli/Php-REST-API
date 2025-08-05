@@ -1,0 +1,583 @@
+### REST API Comprehensive Test Suite
+### CI527 Assignment 2 - Messaging System API
+### Total Tests: 82 comprehensive test cases
+### Tests all functionality, edge cases, and error conditions
+
+@baseUrl = https://rk738.brighton.domains/ci527/assignment2/debug_api.php
+
+#############################################################################
+# POST TESTS - CREATE MESSAGE OPERATIONS (Tests 1-45)
+#############################################################################
+
+### ========== VALID POST REQUESTS (Expected: 201) ==========
+
+### TEST 1
+### Basic valid message creation
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=alice123&target=bob456&message=Hello Bob, how are you doing?
+
+### TEST 2
+### Another valid message with different users
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=bob456&target=alice123&message=Hi Alice! I'm doing good, appreciate that you asked.
+
+### TEST 3
+### Message with special characters and symbols
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=charlie7&target=diana999&message=Check out this link: https://example.com?param=value&other=123
+
+### TEST 4
+### Empty message (should be valid according to spec)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=test1234&target=user5678&message=
+
+### TEST 5
+### Minimum length usernames (4 characters)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=user&target=test&message=Testing minimum username length
+
+### TEST 6
+### Maximum length usernames (16 characters)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=verylongusername&target=anotherlonguser&message=Testing maximum username length
+
+### TEST 7
+### Message with numbers and underscores in usernames
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=user_123&target=test_456&message=Testing usernames with underscores and numbers
+
+### TEST 8
+### Long message content
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=sender123&target=receiver45&message=This is a very long message to test if the API can handle longer text content. It includes multiple sentences and various punctuation marks! Does it work correctly?
+
+### TEST 9
+### Message with URL encoding
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=alice123&target=bob456&message=Visit%20my%20website%3A%20https%3A//example.com%3Fid%3D123%26type%3Duser
+
+### TEST 10
+### Message with quotes and apostrophes
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=writer123&target=reader456&message=She said "Hello!" and I replied "Hi there!"
+
+### TEST 11
+### Message with newline characters (URL encoded)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=poet123&target=critic456&message=Line%20one%0ALine%20two%0ALine%20three
+
+### TEST 12
+### Message with emoji and unicode characters
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=happy123&target=friend456&message=Hello! 😊 How are you? ñáéíóú
+
+### ========== INVALID POST REQUESTS - MISSING PARAMETERS (Expected: 400) ==========
+
+### TEST 13
+### Missing source parameter
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+target=bob456&message=This should fail - missing source
+
+### TEST 14
+### Missing target parameter
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=alice123&message=This should fail - missing target
+
+### TEST 15
+### Missing message parameter
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=alice123&target=bob456
+
+### TEST 16
+### Missing all parameters
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+### TEST 17
+### Empty source parameter
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=&target=bob456&message=Empty source should fail
+
+### TEST 18
+### Empty target parameter
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=alice123&target=&message=Empty target should fail
+
+### ========== INVALID POST REQUESTS - USERNAME VALIDATION (Expected: 400) ==========
+
+### TEST 19
+### Source username too short (3 characters)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=abc&target=test1234&message=Source too short
+
+### TEST 20
+### Target username too short (3 characters)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=test1234&target=xyz&message=Target too short
+
+### TEST 21
+### Source username too long (17 characters)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=verylongusername1&target=test1234&message=Source too long
+
+### TEST 22
+### Target username too long (17 characters)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=test1234&target=verylongusername2&message=Target too long
+
+### TEST 23
+### Source with invalid characters (hyphen)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=test-user&target=validuser&message=Source has invalid character
+
+### TEST 24
+### Target with invalid characters (space)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=validuser&target=test user&message=Target has space
+
+### TEST 25
+### Source with invalid characters (special symbols)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=user@123&target=validuser&message=Source has @ symbol
+
+### TEST 26
+### Target with invalid characters (dot)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=validuser&target=user.123&message=Target has dot
+
+### TEST 27
+### Source starting with number but otherwise valid
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=123user&target=validuser&message=Source starts with number - should be valid
+
+### TEST 28
+### Same source and target (should fail)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=sameuser&target=sameuser&message=Source and target are the same
+
+### ========== EDGE CASES FOR POST (Expected: 201 or 400) ==========
+
+### TEST 29
+### Very long message (stress test)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=stress123&target=test456&message=Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem aperiam eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo
+
+### TEST 30
+### Message with only spaces
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=space123&target=test456&message=
+
+### TEST 31
+### All uppercase usernames
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=UPPERCASE&target=TESTUSER&message=Testing uppercase usernames
+
+### TEST 32
+### Mixed case usernames
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=MixedCase&target=TestUser&message=Testing mixed case usernames
+
+#############################################################################
+# GET TESTS - READ MESSAGE OPERATIONS (Tests 33-62)
+#############################################################################
+
+### ========== VALID GET REQUESTS (Expected: 200 or 204) ==========
+
+### TEST 33
+### Get messages by source only
+GET {{baseUrl}}?source=alice123
+
+### TEST 34
+### Get messages by target only
+GET {{baseUrl}}?target=bob456
+
+### TEST 35
+### Get messages between specific users (source and target)
+GET {{baseUrl}}?source=alice123&target=bob456
+
+### TEST 36
+### Get messages with minimum length username
+GET {{baseUrl}}?source=user
+
+### TEST 37
+### Get messages with maximum length username
+GET {{baseUrl}}?source=verylongusername
+
+### TEST 38
+### Get messages for user that likely has no messages (should return 204)
+GET {{baseUrl}}?source=nonexistentuser
+
+### TEST 39
+### Get messages to user that likely has no messages (should return 204)
+GET {{baseUrl}}?target=nonexistentuser
+
+### TEST 40
+### Get messages between users that likely have no conversation (should return 204)
+GET {{baseUrl}}?source=user1&target=user2
+
+### TEST 41
+### Get messages with all uppercase username
+GET {{baseUrl}}?source=UPPERCASE
+
+### TEST 42
+### Get messages with mixed case username
+GET {{baseUrl}}?source=MixedCase
+
+### ========== INVALID GET REQUESTS - MISSING PARAMETERS (Expected: 400) ==========
+
+### TEST 43
+### No parameters provided
+GET {{baseUrl}}
+
+### TEST 44
+### Empty source parameter
+GET {{baseUrl}}?source=
+
+### TEST 45
+### Empty target parameter
+GET {{baseUrl}}?target=
+
+### TEST 46
+### Both parameters empty
+GET {{baseUrl}}?source=&target=
+
+### ========== INVALID GET REQUESTS - USERNAME VALIDATION (Expected: 400) ==========
+
+### TEST 47
+### Source username too short (3 characters)
+GET {{baseUrl}}?source=abc
+
+### TEST 48
+### Target username too short (3 characters)
+GET {{baseUrl}}?target=xyz
+
+### TEST 49
+### Source username too long (17 characters)
+GET {{baseUrl}}?source=verylongusername1
+
+### TEST 50
+### Target username too long (17 characters)
+GET {{baseUrl}}?target=verylongusername2
+
+### TEST 51
+### Source with invalid characters (hyphen)
+GET {{baseUrl}}?source=test-user
+
+### TEST 52
+### Target with invalid characters (space)
+GET {{baseUrl}}?target=test user
+
+### TEST 53
+### Source with invalid characters (special symbols)
+GET {{baseUrl}}?source=user@123
+
+### TEST 54
+### Target with invalid characters (dot)
+GET {{baseUrl}}?target=user.123
+
+### TEST 55
+### Same source and target (should fail)
+GET {{baseUrl}}?source=sameuser&target=sameuser
+
+### ========== GET EDGE CASES ==========
+
+### TEST 56
+### Get with additional invalid parameters (should ignore them)
+GET {{baseUrl}}?source=alice123&invalidparam=test
+
+### TEST 57
+### Get with URL encoded usernames
+GET {{baseUrl}}?source=user%5F123&target=test%5F456
+
+### TEST 58
+### Case sensitivity test (if database is case sensitive)
+GET {{baseUrl}}?source=Alice123
+
+### TEST 59
+### Get messages sent by user to themselves (after fixing the same user issue)
+GET {{baseUrl}}?source=testuser&target=testuser
+
+### TEST 60
+### Multiple parameters with same name (undefined behavior test)
+GET {{baseUrl}}?source=user1&source=user2
+
+#############################################################################
+# HTTP METHOD TESTS (Tests 61-70)
+#############################################################################
+
+### ========== UNSUPPORTED HTTP METHODS (Expected: 405) ==========
+
+### TEST 61
+### PUT method (should return 405)
+PUT {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=test123&target=user456&message=PUT not allowed
+
+### TEST 62
+### DELETE method (should return 405)
+DELETE {{baseUrl}}
+
+### TEST 63
+### PATCH method (should return 405)
+PATCH {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=test123&target=user456&message=PATCH not allowed
+
+### TEST 64
+### HEAD method (should return 405)
+HEAD {{baseUrl}}
+
+### TEST 65
+### OPTIONS method (should return 405)
+OPTIONS {{baseUrl}}
+
+#############################################################################
+# CONTENT TYPE AND MALFORMED REQUEST TESTS (Tests 66-75)
+#############################################################################
+
+### ========== CONTENT TYPE TESTS ==========
+
+### TEST 66
+### POST with wrong content type (should still work if server is lenient)
+POST {{baseUrl}}
+Content-Type: application/json
+
+source=test123&target=user456&message=Wrong content type
+
+### TEST 67
+### POST with no content type header
+POST {{baseUrl}}
+
+source=test123&target=user456&message=No content type
+
+### TEST 68
+### POST with multipart form data (should fail or be ignored)
+POST {{baseUrl}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="source"
+
+test123
+------WebKitFormBoundary
+Content-Disposition: form-data; name="target"
+
+user456
+------WebKitFormBoundary
+Content-Disposition: form-data; name="message"
+
+Multipart message
+------WebKitFormBoundary--
+
+#############################################################################
+# STRESS AND SECURITY TESTS (Tests 69-78)
+#############################################################################
+
+### ========== STRESS TESTS ==========
+
+### TEST 69
+### Very long username (boundary test)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=exactly16chars&target=user5678&message=Testing exact boundary
+
+### TEST 70
+### SQL Injection attempt in source
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=admin';DROP TABLE message;--&target=user1234&message=SQL injection test
+
+### TEST 71
+### SQL Injection attempt in target
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=user1234&target=admin';DROP TABLE message;--&message=SQL injection test
+
+### TEST 72
+### SQL Injection attempt in message
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=user1234&target=user5678&message=Hello'; DROP TABLE message; --
+
+### TEST 73
+### XSS attempt in message
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=user1234&target=user5678&message=<script>alert('XSS')</script>
+
+### TEST 74
+### HTML injection in message
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=user1234&target=user5678&message=<h1>HTML Injection</h1><p>Test</p>
+
+#############################################################################
+# INTEGRATION AND WORKFLOW TESTS (Tests 75-82)
+#############################################################################
+
+### ========== WORKFLOW TESTS ==========
+
+### TEST 75
+### Create message then retrieve it by source
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=workflow1&target=workflow2&message=Testing workflow - step 1
+
+### TEST 76
+### Retrieve the message created in TEST 75
+GET {{baseUrl}}?source=workflow1
+
+### TEST 77
+### Create another message in the same conversation
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=workflow2&target=workflow1&message=Testing workflow - step 2 reply
+
+### TEST 78
+### Retrieve the entire conversation
+GET {{baseUrl}}?source=workflow1&target=workflow2
+
+### TEST 79
+### Create multiple messages rapidly (stress test)
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=rapid1&target=rapid2&message=Message 1
+
+### TEST 80
+### Second rapid message
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=rapid1&target=rapid2&message=Message 2
+
+### TEST 81
+### Third rapid message
+POST {{baseUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+source=rapid1&target=rapid2&message=Message 3
+
+### TEST 82
+### Retrieve all rapid messages
+GET {{baseUrl}}?source=rapid1&target=rapid2
+
+#############################################################################
+# TEST DOCUMENTATION
+#############################################################################
+
+###
+### TEST COVERAGE SUMMARY:
+###
+### POST Tests (1-32):
+### - Valid message creation (12 tests)
+### - Missing parameters (6 tests)
+### - Invalid username validation (14 tests)
+###
+### GET Tests (33-60):
+### - Valid message retrieval (10 tests)
+### - Missing parameters (4 tests)
+### - Invalid username validation (9 tests)
+### - Edge cases (5 tests)
+###
+### HTTP Method Tests (61-65):
+### - Unsupported methods (5 tests)
+###
+### Content Type Tests (66-68):
+### - Various content types (3 tests)
+###
+### Security Tests (69-74):
+### - SQL injection attempts (4 tests)
+### - XSS and HTML injection (2 tests)
+###
+### Workflow Tests (75-82):
+### - Integration scenarios (8 tests)
+###
+### EXPECTED RESPONSE CODES:
+### - 201: Successful message creation
+### - 200: Successful message retrieval with data
+### - 204: Successful request but no messages found
+### - 400: Bad request (missing/invalid parameters)
+### - 405: Method not allowed
+### - 500: Internal server error
+###
+### This comprehensive test suite covers:
+### ✓ All required functionality
+### ✓ Edge cases and boundary conditions
+### ✓ Error handling scenarios
+### ✓ Security vulnerability testing
+### ✓ Integration workflows
+### ✓ Performance stress testing
+###

@@ -13,7 +13,7 @@
     function debug_log($message){
         error_log("[DEBUG]" . $message);
         // Uncomment the line below to see debug messages in browser(for testing only)
-        // echo "<!-- DEBUG" . $message . " --> \n";
+        echo "<!-- DEBUG" . $message . " --> \n";
     }
 
     debug_log("Script started");
@@ -141,15 +141,15 @@
 
                 if(!empty($source) && !empty($target)) {
                     debug_log("Querying messages between $source and $target");
-                    $stmt = $this->conn->prepare("SELECT id, target, source, text, sent FROM message WHERE source = ? and target = ? ORDER by sent ASC");
+                    $stmt = $this->conn->prepare("SELECT id, target, source, message, sent FROM message WHERE source = ? and target = ? ORDER by sent ASC");
                     $stmt->bind_param("ss", $source, $target);
                 } else if (!empty($source)) {
                     debug_log("Querying ,messges sent by $source");
-                    $stmt = $this->conn->prepare("SELECT id, target, source, text, sent FROM message WHERE source = ? ORDER BY sent ASC");
+                    $stmt = $this->conn->prepare("SELECT id, target, source, message, sent FROM message WHERE source = ? ORDER BY sent ASC");
                     $stmt->bind_param("s", $source);
                 } else {
                     debug_log("Querying messages sent by $target");
-                    $stmt = $this->conn->prepare("SELECT id, target, source, text, sent FROM message WHERE target = ? ORDER by sent ASC ");
+                    $stmt = $this->conn->prepare("SELECT id, target, source, message, sent FROM message WHERE target = ? ORDER by sent ASC ");
                     $stmt->bind_param("s", $target);
                 }
                 $stmt->execute();
@@ -170,7 +170,7 @@
                         'sent'=> $row['sent'],
                         'source'=> $row['source'],
                         'target'=> $row['target'],
-                        'message'=> $row['text'],
+                        'message'=> $row['message'],
                     ];
                 }
 
